@@ -1,0 +1,278 @@
+# https://rpubs.com/maguacanemem/795848
+
+
+# Grafico mejorado DISTINTA CAPACIDAD DE CARGA
+# No tiene la misma capacidad de carga si no está pollutant
+# Lo que yo creo es que no es que llegue a una capacidad de caraga menor, sino que se 
+# demora mas en llegar a la máxima.
+library(ggplot2)
+
+library(deSolve)
+
+# Definir la función de Lotka-Volterra para tres especies
+LotkaVolt3 <- function(t, state, parametros) {
+  with(as.list(c(state, parametros)), {
+    dx1 <- r1 * x1 * (1 - (x1 + a12 * x2) / k1)
+    dx2 <- r2 * x2 * (1 - (x2 + a21 * x1) / k2)
+    dx3 <- r3 * x3 * (1 - x3 / k3)
+    list(c(dx1, dx2, dx3))
+  })
+}
+
+# Parámetros del modelo
+parametros3 <- c(r1 = 0.1, r2 = -0.1, r3 = 0.1, a12 = -0.6, a21 = -0.6, k1 = 300, k2 = 300, k3 = 200)
+
+# Estado inicial de las poblaciones
+state3 <- c(x1 = 20, x2 = 200, x3 = 10)
+
+# Secuencia de tiempo
+tiempos3 <- seq(0, 80, by = 0.1)
+
+# Ejecutar la simulación
+out3 <- ode(func = LotkaVolt3, y = state3, times = tiempos3, parms = parametros3)
+
+# Convertir los resultados en un data frame
+out3_df <- as.data.frame(out3)
+names(out3_df) <- c("Time", "Species 1", "Species 2", "Species 3")
+
+# Crear el gráfico
+plot <- ggplot(out3_df, aes(x = Time)) +
+  geom_line(aes(y = `Species 1`, linetype = "Growth"), color = "black", size = 1) +
+  geom_line(aes(y = `Species 2`, linetype = "Detox"), color = "black", size = 1, linetype = "dotted") +
+  geom_line(aes(y = `Species 3`, linetype = "Growth no pollutant exposure"), color = "black", size = 1, linetype = "dashed") +
+  labs(title= "A",
+       x = "Time",
+       y = "Energy allocated (N° ATP molecules)") +
+  scale_linetype_manual(values = c("solid", "dotted", "dashed")) +
+  theme_minimal() +
+  theme(legend.position="none")+
+  theme(
+    
+    legend.title = element_blank(),
+    legend.key.width = unit(1.5, "cm"),
+    panel.grid.major = element_blank(),  # Eliminar cuadrícula mayor
+    panel.grid.minor = element_blank(),  # Eliminar cuadrícula menor
+    axis.line = element_line(color = "black"), # Agregar líneas negras a los ejes
+    axis.ticks = element_line(color = "black"),
+    axis.text.y = element_text(size = 14),
+    axis.text.x = element_text(size = 14),
+    axis.title.x = element_text(size = 14),
+    axis.title.y = element_text(size = 14),
+    plot.title = element_text(size = 20, face = "bold")
+  )+
+  annotate("text", x = c(76), y = 16, label = "Detox", size = 4)+
+  annotate("text", x = c(71), y = 216, label = "Non-exposed", size = 4)+
+  annotate("text", x = c(78), y = 315, label = "EC", size = 4)
+
+print(plot)
+
+
+
+
+
+
+
+# Igual capacidad de carga
+# PERO DETOX PARTE ALTO PERO SIN PARTIR DESDE LA CAPACIDAD DE CARGA.
+# Parte desde 200 no de 300.
+
+library(ggplot2)
+
+library(deSolve)
+
+# Definir la función de Lotka-Volterra para tres especies
+LotkaVolt3 <- function(t, state, parametros) {
+  with(as.list(c(state, parametros)), {
+    dx1 <- r1 * x1 * (1 - (x1 + a12 * x2) / k1)
+    dx2 <- r2 * x2 * (1 - (x2 + a21 * x1) / k2)
+    dx3 <- r3 * x3 * (1 - x3 / k3)
+    list(c(dx1, dx2, dx3))
+  })
+}
+
+# Parámetros del modelo
+parametros3 <- c(r1 = 0.1, r2 = -0.1, r3 = 0.1, a12 = -0.5, a21 = -0.5, k1 = 300, k2 = 300, k3 = 300)
+
+# Estado inicial de las poblaciones
+state3 <- c(x1 = 20, x2 = 300, x3 = 10)
+
+# Secuencia de tiempo
+tiempos3 <- seq(0, 80, by = 0.1)
+
+# Ejecutar la simulación
+out3 <- ode(func = LotkaVolt3, y = state3, times = tiempos3, parms = parametros3)
+
+# Convertir los resultados en un data frame
+out3_df <- as.data.frame(out3)
+names(out3_df) <- c("Time", "Species 1", "Species 2", "Species 3")
+
+# Crear el gráfico
+plot <- ggplot(out3_df, aes(x = Time)) +
+  geom_line(aes(y = `Species 1`, linetype = "Growth"), color = "black", size = 1) +
+  geom_line(aes(y = `Species 2`, linetype = "Detox"), color = "black", size = 1, linetype = "dotted") +
+  geom_line(aes(y = `Species 3`, linetype = "Growth no pollutant exposure"), color = "black", size = 1, linetype = "dashed") +
+  labs(
+       x = "Time",
+       y = "Energy allocated (N° ATP molecules)") +
+  scale_linetype_manual(values = c("solid", "dotted", "dashed")) +
+  theme_minimal() +
+  theme(legend.position="none")+
+  theme(
+    
+    legend.title = element_blank(),
+    legend.key.width = unit(1.5, "cm"),
+    panel.grid.major = element_blank(),  # Eliminar cuadrícula mayor
+    panel.grid.minor = element_blank(),  # Eliminar cuadrícula menor
+    axis.line = element_line(color = "black"), # Agregar líneas negras a los ejes
+    axis.ticks = element_line(color = "black"),
+    axis.text.y = element_text(size = 14),
+    axis.text.x = element_text(size = 14),
+    axis.title.x = element_text(size = 14),
+    axis.title.y = element_text(size = 14),
+    plot.title = element_text(size = 20, face = "bold")
+  )+
+  annotate("text", x = c(75), y = 20, label = "Detox", size = 4)+
+  annotate("text", x = c(57), y = 200, label = "Non-exposed", size = 4)+
+  annotate("text", x = c(77), y = 315, label = "EC", size = 4)
+
+print(plot)
+
+
+
+
+# Igual capacidad de carga
+# PERO DETOX PARTE ALTO PERO PARTE DESDE LA CAPACIDAD DE CARGA 300.
+
+library(ggplot2)
+
+library(deSolve)
+
+# Definir la función de Lotka-Volterra para tres especies
+LotkaVolt3 <- function(t, state, parametros) {
+  with(as.list(c(state, parametros)), {
+    dx1 <- r1 * x1 * (1 - (x1 + a12 * x2) / k1)
+    dx2 <- r2 * x2 * (1 - (x2 + a21 * x1) / k2)
+    dx3 <- r3 * x3 * (1 - x3 / k3)
+    list(c(dx1, dx2, dx3))
+  })
+}
+
+# Parámetros del modelo
+parametros3 <- c(r1 = 0.1, r2 = -0.1, r3 = 0.1, a12 = -0.5, a21 = -0.5, k1 = 300, k2 = 300, k3 = 300)
+
+# Estado inicial de las poblaciones
+state3 <- c(x1 = 20, x2 = 300, x3 = 20)
+
+# Secuencia de tiempo
+tiempos3 <- seq(0, 80, by = 0.1)
+
+# Ejecutar la simulación
+out3 <- ode(func = LotkaVolt3, y = state3, times = tiempos3, parms = parametros3)
+
+# Convertir los resultados en un data frame
+out3_df <- as.data.frame(out3)
+names(out3_df) <- c("Time", "Species 1", "Species 2", "Species 3")
+
+# Crear el gráfico
+plot <- ggplot(out3_df, aes(x = Time)) +
+  geom_line(aes(y = `Species 1`, linetype = "Growth"), color = "black", size = 1) +
+  geom_line(aes(y = `Species 2`, linetype = "Detox"), color = "black", size = 1, linetype = "dotted") +
+  geom_line(aes(y = `Species 3`, linetype = "Growth no pollutant exposure"), color = "black", size = 1, linetype = "dashed") +
+  labs(
+       x = "Time",
+       y = "Energy allocated (N° ATP molecules)") +
+  scale_linetype_manual(values = c("solid", "dotted", "dashed")) +
+  theme_minimal() +
+  theme(legend.position="none")+
+  theme(
+    
+    legend.title = element_blank(),
+    legend.key.width = unit(1.5, "cm"),
+    panel.grid.major = element_blank(),  # Eliminar cuadrícula mayor
+    panel.grid.minor = element_blank(),  # Eliminar cuadrícula menor
+    axis.line = element_line(color = "black"), # Agregar líneas negras a los ejes
+    axis.ticks = element_line(color = "black"),
+    axis.text.y = element_text(size = 14),
+    axis.text.x = element_text(size = 14),
+    axis.title.x = element_text(size = 14),
+    axis.title.y = element_text(size = 14),
+    plot.title = element_text(size = 20, face = "bold")
+  )+
+  annotate("text", x = c(75), y = 20, label = "DETOX", size = 4)+
+  annotate("text", x = c(33), y = 230, label = "NET", size = 4)+
+  annotate("text", x = c(77), y = 315, label = "ET", size = 4)
+
+print(plot)
+
+
+
+###################################
+# Ahora modelo con valores reales
+
+# CHat gpt generalmente se estima que una célula en crecimiento puede consumir 
+# entre 10^9 y 10^10 moléculas de ATP por segundo.
+
+
+library(ggplot2)
+
+library(deSolve)
+
+# Definir la función de Lotka-Volterra para tres especies
+LotkaVolt3 <- function(t, state, parametros) {
+  with(as.list(c(state, parametros)), {
+    dx1 <- r1 * x1 * (1 - (x1 + a12 * x2) / k1)
+    dx2 <- r2 * x2 * (1 - (x2 + a21 * x1) / k2)
+    dx3 <- r3 * x3 * (1 - x3 / k3)
+    list(c(dx1, dx2, dx3))
+  })
+}
+
+# Parámetros del modelo
+parametros3 <- c(r1 = 0.1, r2 = -0.1, r3 = 0.1, a12 = -0.5, a21 = -0.5, k1 = 80, k2 = 80, k3 = 80)
+
+# Estado inicial de las poblaciones
+# state3 <- c(x1 = log10(1e10), x2 = log10(8e10), x3 = log10(1e10))
+state3 <- c(x1 = 10, x2 = 80, x3 = 10)
+
+# state3 <- c(x1 = 20, x2 = 300, x3 = 20)
+
+# Secuencia de tiempo
+tiempos3 <- seq(0, 80, by = 0.1)
+
+# Ejecutar la simulación
+out3 <- ode(func = LotkaVolt3, y = state3, times = tiempos3, parms = parametros3)
+
+# Convertir los resultados en un data frame
+out3_df <- as.data.frame(out3)
+names(out3_df) <- c("Time", "Species 1", "Species 2", "Species 3")
+
+# Crear el gráfico
+plot <- ggplot(out3_df, aes(x = Time)) +
+  geom_line(aes(y = `Species 1`, linetype = "Growth"), color = "black", size = 1) +
+  geom_line(aes(y = `Species 2`, linetype = "Detox"), color = "black", size = 1, linetype = "dotted") +
+  geom_line(aes(y = `Species 3`, linetype = "Growth no pollutant exposure"), color = "black", size = 1, linetype = "dashed") +
+  labs(
+    x = "Time",
+    y = "Million ATP molecules") +
+  scale_linetype_manual(values = c("solid", "dotted", "dashed")) +
+  theme_minimal() +
+  theme(legend.position="none")+
+  theme(
+    
+    legend.title = element_blank(),
+    legend.key.width = unit(1.5, "cm"),
+    panel.grid.major = element_blank(),  # Eliminar cuadrícula mayor
+    panel.grid.minor = element_blank(),  # Eliminar cuadrícula menor
+    axis.line = element_line(color = "black"), # Agregar líneas negras a los ejes
+    axis.ticks = element_line(color = "black"),
+    axis.text.y = element_text(size = 14),
+    axis.text.x = element_text(size = 14),
+    axis.title.x = element_text(size = 14),
+    axis.title.y = element_text(size = 14),
+    plot.title = element_text(size = 20, face = "bold")
+  )+
+  annotate("text", x = c(75), y = 5, label = "DETOX", size = 4)+
+  annotate("text", x = c(35), y = 55, label = "NET", size = 4)+
+  annotate("text", x = c(35), y = 85, label = "ET", size = 4)
+
+print(plot)
